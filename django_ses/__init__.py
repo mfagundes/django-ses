@@ -150,10 +150,12 @@ class SESBackend(BaseEmailBackend):
                 # end of throttling
 
             try:
+                msg = message.message()
+                raw_message = unicode(msg.as_string(), msg.encoding)
                 response = self.connection.send_raw_email(
                     source=source or message.from_email,
                     destinations=message.recipients(),
-                    raw_message=unicode(dkim_sign(message.message().as_string()), 'utf-8')
+                    raw_message=dkim_sign(raw_message)
                 )
                 message.extra_headers['status'] = 200
                 message.extra_headers['message_id'] = response[
